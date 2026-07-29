@@ -1,5 +1,5 @@
-import React, { Suspense } from 'react';
-import { BrowserRouter, Routes, Route, NavLink, useLocation } from 'react-router-dom';
+import React, { Suspense, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Activity, Brain, FileText, ShieldCheck, Database, HeartPulse, ClipboardCheck } from 'lucide-react';
 import ErrorBoundary from './components/ErrorBoundary';
 import KeepAlive from './components/KeepAlive';
@@ -9,7 +9,6 @@ const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const Events    = React.lazy(() => import('./pages/Events'));
 const Predict   = React.lazy(() => import('./pages/Predict'));
 const Report    = React.lazy(() => import('./pages/Report'));
-const Health    = React.lazy(() => import('./pages/Health'));
 const Logs      = React.lazy(() => import('./pages/Logs'));
 const Login     = React.lazy(() => import('./pages/Login'));
 const Actions   = React.lazy(() => import('./pages/Actions'));
@@ -19,7 +18,6 @@ const NAV = [
   { to: '/events',  label: 'Live Events',     icon: Activity },
   { to: '/predict', label: 'Predict',         icon: Brain },
   { to: '/report',  label: 'Handover Report', icon: FileText },
-  { to: '/health',  label: 'Health',          icon: HeartPulse },
   { to: '/logs',    label: 'Event Logs',      icon: Database },
   { to: '/actions', label: 'Actions',         icon: ClipboardCheck },
 ];
@@ -29,13 +27,18 @@ const ROUTES = [
   { path: '/events',  Component: Events },
   { path: '/predict', Component: Predict },
   { path: '/report',  Component: Report },
-  { path: '/health',  Component: Health },
   { path: '/logs',    Component: Logs },
   { path: '/actions', Component: Actions },
 ];
 
 function MainLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('xai_token');
+    if (!token) navigate('/login', { replace: true });
+  }, [navigate]);
 
   const isActive = (path, exact) =>
     exact ? location.pathname === path : location.pathname.startsWith(path);
@@ -79,7 +82,7 @@ function MainLayout() {
       </main>
 
       <footer className="bg-white border-t text-center text-xs text-gray-400 py-3">
-        XAI Admin Monitor · Abubakar Dahiru · KASU Final Year Project
+        XAI Admin Monitor
       </footer>
     </div>
   );

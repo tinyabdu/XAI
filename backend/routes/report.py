@@ -9,7 +9,7 @@ router = APIRouter()
 
 
 @router.get("/report")
-def get_report(events: int = 25, hours: int = 8):
+def get_report(events: int = 25, hours: int = 8, token: str = Depends(verify_token)):
     """Generate a full handover report for the admin."""
     batch = simulate_batch(n=events, hours_ago=hours)
 

@@ -99,7 +99,7 @@ export default function Actions() {
       {/* NCAIR note */}
       <div className="bg-purple-50 border border-purple-100 rounded-xl p-4 text-xs text-purple-700">
         <strong>Human-in-the-Loop Compliance (NCAIR 2024):</strong> Every admin action is permanently stored alongside the AI decision.
-        This ensures the administrator is always the final authority — the AI assists but never acts alone.
+        This ensures the administrator is always the final authority the AI assists but never acts alone.
       </div>
     </div>
   );

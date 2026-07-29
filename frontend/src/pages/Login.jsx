@@ -30,7 +30,7 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <ShieldCheck className="mx-auto mb-3 text-blue-700" size={48} />
           <h1 className="text-2xl font-bold text-gray-800">XAI Admin Monitor</h1>
-          <p className="text-sm text-gray-500 mt-1">Explainable AI — Website Security Dashboard</p>
+          <p className="text-sm text-gray-500 mt-1">Explainable AI Website Security Dashboard</p>
           <p className="text-xs text-gray-400 mt-1">Abubakar Dahiru · KASU/23/CSC/2082</p>
         </div>
 
@@ -79,13 +79,6 @@ export default function LoginPage() {
           </button>
         </div>
 
-        <div className="mt-6 bg-blue-50 border border-blue-100 rounded-lg px-4 py-3 text-xs text-blue-700">
-          <strong>Default credentials:</strong> username <code>admin</code> · password <code>admin1234</code>
-        </div>
-
-        <p className="text-center text-xs text-gray-400 mt-6">
-          Built in compliance with NCAIR National AI Strategy (2024) · Human-in-the-loop design
-        </p>
       </div>
     </div>
   );
