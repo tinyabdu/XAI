@@ -5,7 +5,7 @@ from services.live import manager
 
 router = APIRouter()
 
-
+#live event
 @router.websocket("/ws/live")
 async def live_stream(websocket: WebSocket, token: str = ""):
     if not is_valid_token(token):
