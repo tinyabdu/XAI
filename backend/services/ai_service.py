@@ -42,6 +42,16 @@ ACTION_MAP = {
     "suspicious": "flagged",
 }
 
+# Cached explainers so live streaming doesn't rebuild them per event
+_TREE_EXPLAINER = shap.TreeExplainer(MODEL)
+_LIME_EXPLAINER = lime.lime_tabular.LimeTabularExplainer(
+    X_TRAIN,
+    feature_names=[FEATURE_LABELS[f] for f in FEATURES],
+    class_names=list(LE.classes_),
+    mode="classification",
+    random_state=42,
+)
+
 
 def predict_single(data: dict) -> dict:
     x = np.array([[data[f] for f in FEATURES]])
@@ -51,8 +61,7 @@ def predict_single(data: dict) -> dict:
     confidence = round(float(proba[pred_enc]) * 100, 1)
 
     # SHAP explanation
-    explainer = shap.TreeExplainer(MODEL)
-    shap_vals = explainer.shap_values(x)
+    shap_vals = _TREE_EXPLAINER.shap_values(x)
     # shap_vals shape: (n_classes, n_samples, n_features)
     class_idx = pred_enc
     n_classes = len(LE.classes_)
@@ -91,14 +100,7 @@ def predict_single(data: dict) -> dict:
 
 
 def _lime_explain(x_instance, pred_class):
-    explainer = lime.lime_tabular.LimeTabularExplainer(
-        X_TRAIN,
-        feature_names=[FEATURE_LABELS[f] for f in FEATURES],
-        class_names=list(LE.classes_),
-        mode="classification",
-        random_state=42,
-    )
-    exp = explainer.explain_instance(x_instance, MODEL.predict_proba, num_features=6, top_labels=1)
+    exp = _LIME_EXPLAINER.explain_instance(x_instance, MODEL.predict_proba, num_features=6, top_labels=1)
     label_idx = list(exp.available_labels())[0]
     lime_list = [
         {"feature": feat, "weight": round(float(weight), 4)}
@@ -108,8 +110,7 @@ def _lime_explain(x_instance, pred_class):
 
 
 def get_shap_global():
-    explainer = shap.TreeExplainer(MODEL)
-    shap_vals = explainer.shap_values(X_TRAIN)
+    shap_vals = _TREE_EXPLAINER.shap_values(X_TRAIN)
     # Mean absolute SHAP across all classes
     if isinstance(shap_vals, list):
         mean_abs = np.mean([np.abs(sv) for sv in shap_vals], axis=0).mean(axis=0)

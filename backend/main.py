@@ -1,8 +1,27 @@
+import asyncio
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import predict, report, simulate, auth, health, actions
+from routes import predict, report, simulate, auth, health, actions, live
+from services.live import manager
 
-app = FastAPI(title="XAI Admin Monitor", version="1.0.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Start the live traffic generator when the server boots.
+    task = asyncio.create_task(manager.run())
+    try:
+        yield
+    finally:
+        task.cancel()
+        try:
+            await task
+        except asyncio.CancelledError:
+            pass
+
+
+app = FastAPI(title="XAI Admin Monitor", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -18,6 +37,7 @@ app.include_router(simulate.router, prefix="/api")
 app.include_router(auth.router, prefix="/api")
 app.include_router(health.router, prefix="/api")
 app.include_router(actions.router, prefix="/api")
+app.include_router(live.router, prefix="/api")
 
 @app.get("/")
 def root():

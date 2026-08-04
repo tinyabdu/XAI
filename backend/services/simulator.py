@@ -66,27 +66,35 @@ TYPE_FUNCS = {
     "suspicious": _random_suspicious,
 }
 
+WEIGHTS = [0.60, 0.20, 0.10, 0.10]
+TRAFFIC_TYPES = list(TYPE_FUNCS.keys())
+
+
+def generate_event():
+    """Generate a single simulated traffic event evaluated by the AI in real time."""
+    ttype = random.choices(TRAFFIC_TYPES, weights=WEIGHTS, k=1)[0]
+    data = TYPE_FUNCS[ttype]()
+    result = predict_single(data)
+    return {
+        "id": str(uuid.uuid4()),
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "ip": random.choice(SAMPLE_IPS),
+        "true_type": ttype,
+        **result,
+    }
+
 
 def simulate_batch(n: int = 20, hours_ago: int = 8):
     """Generate n simulated traffic events spread over the last `hours_ago` hours."""
     now = datetime.utcnow()
     start = now - timedelta(hours=hours_ago)
     events = []
-    weights = [0.60, 0.20, 0.10, 0.10]
-    traffic_types = list(TYPE_FUNCS.keys())
 
-    for i in range(n):
-        ttype = random.choices(traffic_types, weights=weights, k=1)[0]
-        data = TYPE_FUNCS[ttype]()
-        result = predict_single(data)
-        timestamp = start + timedelta(seconds=random.randint(0, hours_ago * 3600))
-        events.append({
-            "id": str(uuid.uuid4()),
-            "timestamp": timestamp.isoformat() + "Z",
-            "ip": random.choice(SAMPLE_IPS),
-            "true_type": ttype,
-            **result,
-        })
+    for _ in range(n):
+        event = generate_event()
+        ts = start + timedelta(seconds=random.randint(0, hours_ago * 3600))
+        event["timestamp"] = ts.isoformat() + "Z"
+        events.append(event)
 
     events.sort(key=lambda e: e["timestamp"])
     return events

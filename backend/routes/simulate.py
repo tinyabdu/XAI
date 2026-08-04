@@ -3,8 +3,6 @@ from fastapi import APIRouter, Depends
 from routes.auth import verify_token
 from services.simulator import simulate_batch
 from services.log_service import save_events, get_stats
-router = APIRouter()
-
 
 router = APIRouter()
 

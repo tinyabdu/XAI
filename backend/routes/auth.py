@@ -25,10 +25,14 @@ def _issue_token() -> str:
     return token
 
 
+def is_valid_token(token: str) -> bool:
+    expiry = ACTIVE_TOKENS.get(token)
+    return bool(expiry and time.time() <= expiry)
+
+
 def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
     token = credentials.credentials
-    expiry = ACTIVE_TOKENS.get(token)
-    if not expiry or time.time() > expiry:
+    if not is_valid_token(token):
         raise HTTPException(status_code=401, detail="Invalid or expired token. Please log in again.")
     return token
 

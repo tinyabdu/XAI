@@ -58,6 +58,7 @@ Dashboard will open at: http://localhost:3000
 | GET    | /api/simulate     | Generate simulated traffic events        |
 | POST   | /api/predict      | Predict a single traffic sample          |
 | GET    | /api/shap/global  | Global SHAP feature importance           |
+| WS     | /api/ws/live      | Live real-time stream of AI decisions    |
 
 ---
 
@@ -74,9 +75,14 @@ Dashboard will open at: http://localhost:3000
 ## Features
 
 - **Dashboard** — Risk breakdown pie, classification bar chart, global SHAP
-- **Live Events** — Simulate traffic, filter by action/risk, expand each event for SHAP & LIME
+- **Live Events** — Continuous real-time WebSocket stream of AI decisions; filter by action/risk, expand each event for SHAP & LIME, and take admin action
 - **Predict** — Manual input form with quick presets (Normal / Brute Force / DDoS / Suspicious)
 - **Handover Report** — Plain-English summary of what the AI did, top threats, all events
+
+> **Live mode:** the backend auto-generates and evaluates traffic on a timer
+> (default every 3s, configurable via `LIVE_INTERVAL` / `LIVE_EVENTS_PER_TICK`
+> env vars) and pushes each decision to connected admins over WebSocket while
+> saving a permanent record to the SQLite log.
 
 ---
 

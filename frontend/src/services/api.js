@@ -37,3 +37,18 @@ export const getLogs     = (limit = 100)             => api.get(`/api/logs?limit
 
 export const postAction  = (data)         => api.post('/api/actions', data);
 export const getActions  = ()             => api.get('/api/actions');
+
+// Live WebSocket stream of AI-evaluated traffic events.
+// handlers: { onEvent(event), onStatus('connected'|'disconnected') }
+export const connectLive = (handlers = {}) => {
+  const token = localStorage.getItem('xai_token');
+  const wsBase = BASE.replace(/^http/, 'ws');
+  const ws = new WebSocket(`${wsBase}/api/ws/live?token=${encodeURIComponent(token || '')}`);
+  ws.onopen = () => handlers.onStatus?.('connected');
+  ws.onmessage = (e) => {
+    try { handlers.onEvent?.(JSON.parse(e.data)); } catch (_) {}
+  };
+  ws.onerror = () => handlers.onStatus?.('disconnected');
+  ws.onclose = () => handlers.onStatus?.('disconnected');
+  return ws;
+};

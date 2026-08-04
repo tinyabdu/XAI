@@ -22,7 +22,11 @@ export default function Logs() {
     }
   }, []);
 
-  useEffect(() => { fetchLogs(); }, [fetchLogs]);
+  useEffect(() => {
+    fetchLogs();
+    const t = setInterval(fetchLogs, 10000);
+    return () => clearInterval(t);
+  }, [fetchLogs]);
 
   if (loading) return (
     <div className="flex items-center justify-center h-64 text-gray-500">
@@ -56,7 +60,7 @@ export default function Logs() {
           <Database className="text-blue-600" size={24} />
           <div>
             <h2 className="text-xl font-bold text-gray-800">Stored Event Logs</h2>
-            <p className="text-sm text-gray-500">All AI decisions saved to the database permanent record</p>
+            <p className="text-sm text-gray-500">All AI decisions saved to the database permanent record · auto-refreshes every 10 seconds</p>
           </div>
         </div>
         <button onClick={fetchLogs}
