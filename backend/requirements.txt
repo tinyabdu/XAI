@@ -1,8 +1,5 @@
 fastapi[standard]
 uvicorn
-scikit-learn
-shap
-lime
-pandas
-numpy
+sqlalchemy
 pydantic
+pydantic[email]

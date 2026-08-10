@@ -1,0 +1,40 @@
+
+> xai-admin-dashboard@1.0.0 build
+> react-scripts build
+
+(node:340) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Creating an optimized production build...
+Compiled with warnings.
+
+Failed to parse source map from 'C:\Users\user\Documents\XAI\frontend\node_modules\lucide-react\dist\cjs\lucide-react.js.map' file: Error: ENOENT: no such file or directory, open 'C:\Users\user\Documents\XAI\frontend\node_modules\lucide-react\dist\cjs\lucide-react.js.map'
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+File sizes after gzip:
+
+  184.46 kB  build\static\js\main.149c3fca.js
+  18.47 kB   build\static\js\77.dd87ed08.chunk.js
+  4.77 kB    build\static\css\main.32bff2b6.css
+  4.57 kB    build\static\js\973.ce6ce96e.chunk.js
+  3.94 kB    build\static\js\688.53b14063.chunk.js
+  3.75 kB    build\static\js\27.c6ede0a6.chunk.js
+  2.81 kB    build\static\js\339.78242a67.chunk.js
+  2.16 kB    build\static\js\14.99636a51.chunk.js
+  2.14 kB    build\static\js\490.7b7e8df9.chunk.js
+  912 B      build\static\js\505.d6218789.chunk.js
+
+The project was built assuming it is hosted at /.
+You can control this with the homepage field in your package.json.
+
+The build folder is ready to be deployed.
+You may serve it with a static server:
+
+  npm install -g serve
+  serve -s build
+
+Find out more about deployment here:
+
+  https://cra.link/deployment
+

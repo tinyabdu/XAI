@@ -17,6 +17,7 @@ api.interceptors.response.use(
   err => {
     if (err.response?.status === 401) {
       localStorage.removeItem('xai_token');
+      localStorage.removeItem('xai_role');
       window.location.href = '/login';
     }
     return Promise.reject(err);
@@ -24,31 +25,36 @@ api.interceptors.response.use(
 );
 
 
+// ── Auth ───────────────────────────────────────────────────────────────
+export const register  = (data)            => api.post('/api/auth/register', data);
+export const login     = (email, password) => api.post('/api/auth/login', { email, password });
+export const logout    = ()                => api.post('/api/auth/logout');
+export const getMe     = ()                => api.get('/api/auth/me');
 
-export const login       = (username, password)      => api.post('/api/auth/login', { username, password });
-export const logout      = ()                        => api.post('/api/auth/logout');
-export const getMe       = ()                        => api.get('/api/auth/me');
-export const getReport   = (events = 25, hours = 8) => api.get(`/api/report?events=${events}&hours=${hours}`);
-export const getSimulate = (n = 10, hours = 8)      => api.get(`/api/simulate?n=${n}&hours=${hours}`);
-export const getShapGlobal = ()                      => api.get('/api/shap/global');
-export const postPredict = (data)                    => api.post('/api/predict', data);
-export const getHealth   = ()                        => api.get('/api/health');
-export const getLogs     = (limit = 100)             => api.get(`/api/logs?limit=${limit}`);
-
-export const postAction  = (data)         => api.post('/api/actions', data);
-export const getActions  = ()             => api.get('/api/actions');
-
-// Live WebSocket stream of AI-evaluated traffic events.
-// handlers: { onEvent(event), onStatus('connected'|'disconnected') }
-export const connectLive = (handlers = {}) => {
-  const token = localStorage.getItem('xai_token');
-  const wsBase = BASE.replace(/^http/, 'ws');
-  const ws = new WebSocket(`${wsBase}/api/ws/live?token=${encodeURIComponent(token || '')}`);
-  ws.onopen = () => handlers.onStatus?.('connected');
-  ws.onmessage = (e) => {
-    try { handlers.onEvent?.(JSON.parse(e.data)); } catch (_) {}
-  };
-  ws.onerror = () => handlers.onStatus?.('disconnected');
-  ws.onclose = () => handlers.onStatus?.('disconnected');
-  return ws;
+// ── Student ────────────────────────────────────────────────────────────
+export const getProgrammes       = () => api.get('/api/programmes');
+export const postApplication     = (data) => api.post('/api/applications', data);
+export const getMyApplication    = () => api.get('/api/applications/me');
+export const getDocTypes         = () => api.get('/api/documents/types');
+export const getMyDocuments      = () => api.get('/api/applications/documents');
+export const uploadDocument      = (docType, file) => {
+  const fd = new FormData();
+  fd.append('doc_type', docType);
+  fd.append('file', file);
+  return api.post('/api/applications/documents', fd);
 };
+export const deleteDocument      = (id) => api.delete(`/api/documents/${id}`);
+export const downloadUrl         = (id) => {
+  const token = localStorage.getItem('xai_token');
+  return `${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/documents/${id}/download?token=${encodeURIComponent(token || '')}`;
+};
+
+// ── Admin ──────────────────────────────────────────────────────────────
+export const getAdminApplications = ()     => api.get('/api/admin/applications');
+export const runAdmission        = ()      => api.post('/api/admin/run-admission');
+export const overrideApplication = (id, data) => api.post(`/api/admin/applications/${id}/override`, data);
+export const getDepartments      = ()      => api.get('/api/admin/departments');
+export const createDepartment    = (data) => api.post('/api/admin/departments', data);
+export const createCourse        = (data) => api.post('/api/admin/courses', data);
+export const updateCourse        = (id, data) => api.put(`/api/admin/courses/${id}`, data);
+export const deleteCourse        = (id)    => api.delete(`/api/admin/courses/${id}`);
