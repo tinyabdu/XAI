@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Loader, CheckCircle2, XCircle, Clock, GraduationCap, Info, AlertTriangle, Download } from 'lucide-react';
 import { getMyApplication, downloadUrl } from '../services/api';
+import FeatureBars from '../components/FeatureBars';
 
 const DOC_LABELS = {
   passport: 'Passport Photo',
@@ -65,7 +66,7 @@ export default function Status() {
           </div>
           {app.ai_score != null && (
             <div className="ml-auto text-right">
-              <div className="text-xs uppercase tracking-wide opacity-70">Composite Score</div>
+              <div className="text-xs uppercase tracking-wide opacity-70">Admission Likelihood</div>
               <div className="font-bold text-2xl">{app.ai_score}</div>
             </div>
           )}
@@ -93,6 +94,7 @@ export default function Status() {
         ) : (
           <p className="text-sm text-gray-500">Decision pending — the admissions officer has not run the admission process yet. <Link to="/apply" className="text-blue-700 underline">View/Edit my application</Link></p>
         )}
+        <FeatureBars features={app.ai_features} />
       </div>
 
       {/* Bio/JAMB/O-level summary */}

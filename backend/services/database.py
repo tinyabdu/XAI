@@ -41,6 +41,7 @@ class Application(Base):
     status = Column(String, default="applied")
     ai_score = Column(Float)
     ai_explanation = Column(Text)
+    ai_features = Column(Text)
     admin_override = Column(Text)
     submitted_at = Column(String)
     created_at = Column(String, nullable=False)
@@ -116,6 +117,19 @@ class Course(Base):
 Base.metadata.create_all(engine)
 
 
+def _ensure_column(table: str, column: str, coldef: str):
+    """Lightweight migration: add a column to an existing table if missing."""
+    from sqlalchemy import text as _sa_text
+    with engine.connect() as conn:
+        cols = {row[1] for row in conn.execute(_sa_text(f"PRAGMA table_info({table})"))}
+        if column not in cols:
+            conn.execute(_sa_text(f"ALTER TABLE {table} ADD COLUMN {column} {coldef}"))
+            conn.commit()
+
+
+_ensure_column("applications", "ai_features", "TEXT")
+
+
 def _now():
     return datetime.utcnow().isoformat() + "Z"
 
@@ -158,6 +172,7 @@ def _app_to_dict(app: Application) -> dict:
         "status": app.status,
         "ai_score": app.ai_score,
         "ai_explanation": app.ai_explanation,
+        "ai_features": app.ai_features,
         "admin_override": app.admin_override,
         "submitted_at": app.submitted_at,
         "olevel": [
@@ -242,6 +257,7 @@ def upsert_application(user_id, full_name, data: dict, olevel: list):
             status="applied",
             ai_score=None,
             ai_explanation=None,
+            ai_features=None,
             admin_override=None,
             submitted_at=now,
         )
@@ -294,12 +310,13 @@ def get_pending_applications() -> list:
         return [_app_to_dict(a) for a in apps]
 
 
-def save_decision(application_id, status, score, explanation: list):
+def save_decision(application_id, status, score, explanation: list, features: dict = None):
     with _session() as db:
         app = db.query(Application).filter(Application.id == application_id).first()
         app.status = status
         app.ai_score = score
         app.ai_explanation = json.dumps(explanation)
+        app.ai_features = json.dumps(features) if features else None
         db.commit()
 
 

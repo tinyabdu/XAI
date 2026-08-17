@@ -133,14 +133,25 @@ def evaluate_application(app: dict) -> dict:
 
 
 def run_admission(apps: list) -> dict:
-    """Evaluate a batch of applications and persist the results."""
+    """Score a batch of applications with the ML engine (SHAP/LIME) and persist.
+
+    Falls back to the deterministic rule engine if the ML model is unavailable.
+    """
     from services.database import save_decision
 
     results = {"admitted": 0, "waitlisted": 0, "rejected": 0, "evaluated": 0}
     per_programme = {}
     for app in apps:
-        decision = evaluate_application(app)
-        save_decision(app["id"], decision["status"], decision["score"], decision["explanation"])
+        try:
+            from services.ml_service import predict_application
+            decision = predict_application(app)
+        except Exception:
+            decision = evaluate_application(app)
+            decision["features"] = None
+        save_decision(
+            app["id"], decision["status"], decision["score"],
+            decision["explanation"], decision.get("features"),
+        )
         results[decision["status"]] = results.get(decision["status"], 0) + 1
         results["evaluated"] += 1
         key = get_programme(app.get("programme", ""))

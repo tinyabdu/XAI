@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Loader, Rocket, Users, CheckCircle2, XCircle, Clock, Inbox, ChevronDown, ChevronUp, RefreshCw, Download } from 'lucide-react';
 import { getAdminApplications, runAdmission, downloadUrl } from '../services/api';
 import { useDialogs } from '../components/Dialogs';
+import FeatureBars from '../components/FeatureBars';
 
 const STATUS_STYLE = {
   admitted:  'bg-green-100 text-green-800',
@@ -205,6 +206,7 @@ export default function Admin() {
                                     ))}
                                   </ol>
                                 ) : <p className="text-xs text-gray-400">Not assessed yet. Click "Run AI Admission".</p>}
+                                <FeatureBars features={a.ai_features} />
                                 <div className="flex gap-2 mt-4 flex-wrap">
                                   <button onClick={() => handleOverride(a.id, 'admitted')} className="text-xs px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-md">Admit</button>
                                   <button onClick={() => handleOverride(a.id, 'waitlisted')} className="text-xs px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md">Waitlist</button>

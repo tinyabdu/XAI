@@ -94,17 +94,29 @@ Portal will open at: http://localhost:3000
 
 ## Admission Logic (Explainable AI)
 
-The decision engine in `services/admission_service.py` works as follows:
+The decision engine is **machine-learning based** (`services/ml_service.py`):
 
-1. **JAMB cut-off** — score must meet the programme cut-off (e.g. CSC: 170).
-2. **Age check** — applicant must fall within the programme's age range.
-3. **O-Level credits** — at least 5 credits, and every compulsory subject for the
-   programme must be credited (A1/B2/B3/C4/C5/C6).
-4. **Composite score** — weighted blend of JAMB (60%) and average O-Level points (40%).
-5. **Merit tier** — score ≥ 70 → **Admitted**; 55–70 → **Waitlisted**; below → **Rejected**.
-
-Each decision stores a human-readable explanation list, so students and admins
-always know *why* an applicant was admitted or not.
+1. **Training data** — a synthetic corpus (~4000 applicants) is generated from the
+   admission criteria and labelled by the rule engine in
+   `services/admission_service.py` (JAMB cut-off, age band, O-level credits,
+   composite score).
+2. **Model** — a scikit-learn `RandomForestClassifier` is trained to predict
+   Admitted / Waitlisted / Rejected from features like JAMB score, age, credit
+   count and programme cut-off. The trained model is cached in `data/ml/` and
+   retrained automatically whenever the programme catalogue changes.
+3. **Decision** — each new application is scored by the ML model
+   (`/api/admin/run-admission`), giving a status and an admission-likelihood
+   probability.
+4. **SHAP** — `shap.TreeExplainer` computes exact per-feature attributions,
+   showing what pushed each applicant's decision and by how much.
+5. **LIME** — a local surrogate model (`lime.lime_tabular`) independently
+   explains the same prediction; the two explanations are shown side-by-side on
+   the student status page and the admin dashboard.
+6. **Fallback** — if the ML engine is unavailable, the deterministic rules in
+   `admission_service.py` still produce a decision.
+7. **Admin override** — an officer can manually change a decision to
+   Admitted / Waitlisted / Rejected with a reason; the student sees it on their
+   status page.
 
 ---
 
@@ -113,6 +125,7 @@ always know *why* an applicant was admitted or not.
 | Layer     | Technology                        |
 |-----------|-----------------------------------|
 | Backend   | Python, FastAPI, uvicorn          |
+| AI/ML     | scikit-learn (RandomForest), SHAP, LIME, joblib |
 | Data      | SQLAlchemy ORM, SQLite            |
 | Frontend  | React 18, Tailwind CSS, lucide    |
 | HTTP      | axios                             |

@@ -13,6 +13,7 @@ router = APIRouter()
 def _serialise(app: dict) -> dict:
     app = dict(app)
     app["ai_explanation"] = json.loads(app["ai_explanation"]) if app.get("ai_explanation") else []
+    app["ai_features"] = json.loads(app["ai_features"]) if app.get("ai_features") else None
     app["admin_override"] = json.loads(app["admin_override"]) if app.get("admin_override") else None
     app["status_label"] = status_label(app.get("status"))
     from services.programmes import get_programme
@@ -31,6 +32,13 @@ def _serialise(app: dict) -> dict:
 def list_applications(user: dict = Depends(require_admin)):
     apps = db.list_all_applications()
     return {"applications": [_serialise(a) for a in apps], "stats": db.get_stats()}
+
+
+@router.get("/admin/model")
+def model_info(user: dict = Depends(require_admin)):
+    """Return metadata about the trained ML engine (sklearn model + accuracy)."""
+    from services import ml_service
+    return ml_service.model_summary()
 
 
 @router.post("/admin/run-admission")
@@ -59,7 +67,7 @@ def override_application(app_id: int, payload: OverrideRequest, user: dict = Dep
     return {"message": "Decision updated.", "status": payload.status}
 
 
-# ── Departments & Courses management ───────────────────────────────────
+# Departments & Courses management
 
 class DepartmentRequest(BaseModel):
     code: str

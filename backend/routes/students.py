@@ -49,6 +49,7 @@ def _serialise(app: dict) -> dict:
     import json
     app = dict(app)
     app["ai_explanation"] = json.loads(app["ai_explanation"]) if app.get("ai_explanation") else []
+    app["ai_features"] = json.loads(app["ai_features"]) if app.get("ai_features") else None
     app["admin_override"] = json.loads(app["admin_override"]) if app.get("admin_override") else None
     app["status_label"] = status_label(app.get("status"))
     prog = get_programme(app.get("programme", ""))

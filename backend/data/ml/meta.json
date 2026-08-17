@@ -1,0 +1,24 @@
+{
+  "signature": "b34c5114cc809627dafabce3073757586629e18fbb93749d1af750905ec31094",
+  "classes": [
+    "admitted",
+    "rejected",
+    "waitlisted"
+  ],
+  "features": [
+    "jamb_score",
+    "jamb_margin",
+    "meets_cutoff",
+    "age",
+    "age_in_range",
+    "credit_count",
+    "credits_met",
+    "compulsory_hit",
+    "missing_compulsory",
+    "avg_grade_points",
+    "cutoff"
+  ],
+  "n_samples": 3400,
+  "accuracy": 0.9967,
+  "model": "RandomForestClassifier (scikit-learn)"
+}

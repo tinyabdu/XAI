@@ -3,3 +3,7 @@ uvicorn
 sqlalchemy
 pydantic
 pydantic[email]
+scikit-learn
+shap
+lime
+joblib
